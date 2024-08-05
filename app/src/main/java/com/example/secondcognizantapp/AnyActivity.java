@@ -11,12 +11,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class AnyActivity extends AppCompatActivity {
     Button notifyButton;
@@ -48,9 +44,10 @@ public class AnyActivity extends AppCompatActivity {
 
         createNotificationChannel();
 
+        // creating snooze button action for notification bar
+        // its a broadcast receiver
         String ACTION_SNOOZE = "snooze";
-
-        Intent snoozeIntent = new Intent(this, Snooze.class);
+        Intent snoozeIntent = new Intent(this, SnoozeReceiver.class);
         snoozeIntent.setAction(ACTION_SNOOZE);
         snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, 0);
         PendingIntent snoozePendingIntent =
@@ -62,6 +59,7 @@ public class AnyActivity extends AppCompatActivity {
                 .setContentText("alert content")
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                // snooze button is called like this
                 .addAction(R.drawable.baseline_snooze_24, "Snooze",
                         snoozePendingIntent);
 
