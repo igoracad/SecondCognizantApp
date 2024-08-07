@@ -6,21 +6,27 @@ import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 
+import com.example.academyday2.IAddListener;
 import com.example.secondcognizantapp.databinding.ActivityAnyBinding;
 
 public class AnyActivity extends AppCompatActivity {
     //Button notifyButton;
 
     private ActivityAnyBinding binding;
+    IAddListener iRemoteService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +56,43 @@ public class AnyActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        binding.btnBind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //  Class<?> pack = IAddListener.class.getPackage();
+                Intent intent = new Intent("ineed.add");
+                intent.setPackage("com.example.academyday2");
+                bindService(intent, connection, BIND_AUTO_CREATE);
+            }
+        });
+    }
+
+    ServiceConnection connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder aidlBinder) {
+            Log.i("clientActivity", "client activity  connected to service");
+            iRemoteService = IAddListener.Stub.asInterface(aidlBinder);
+            int sum = 0;
+            try {
+                sum = iRemoteService.add(10, 20);
+                binding.tvSum.setText(""+sum);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.i("clientActivity", "Service disconnected: " + name);
+            iRemoteService = null;
+
+        }
+    };
 
     private void openMainActivity() {
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
