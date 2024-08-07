@@ -44,6 +44,8 @@ public class AnyActivity extends AppCompatActivity {
         binding.btnAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // opens activity after one minute
+                // defined with alarm manager
                 openMainActivity();
             }
         });
