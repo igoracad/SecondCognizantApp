@@ -2,6 +2,7 @@ package com.example.secondcognizantapp;
 
 import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 
+import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,27 +15,47 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 
-public class AnyActivity extends AppCompatActivity {
-    Button notifyButton;
+import com.example.secondcognizantapp.databinding.ActivityAnyBinding;
 
+public class AnyActivity extends AppCompatActivity {
+    //Button notifyButton;
+
+    private ActivityAnyBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_any);
-        notifyButton = findViewById(R.id.btnNotify);
+        binding = ActivityAnyBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+        //notifyButton = findViewById(R.id.btnNotify);
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        notifyButton.setOnClickListener(new View.OnClickListener() {
+        binding.btnNotify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showNotification();
             }
         });
+        binding.btnAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openMainActivity();
+            }
+        });
+    }
+
+    private void openMainActivity() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        long triggerTime = System.currentTimeMillis()+30*60;
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent, PendingIntent.FLAG_IMMUTABLE);
+        alarmManager.set(AlarmManager.RTC, triggerTime, pendingIntent);
     }
 
     private void showNotification() {
